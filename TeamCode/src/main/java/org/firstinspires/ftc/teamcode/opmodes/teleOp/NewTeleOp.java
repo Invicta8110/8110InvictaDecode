@@ -16,10 +16,20 @@ public class NewTeleOp extends OpMode {
     public void init() {
         robot = new BumbleBot(hardwareMap);
         gamepad = gamepad1;
+        telemetry.addData("Test","test");
     }
 
     public void loop() {
-        double y = -gamepad.left_stick_y; // Remember, Y stick is reversed!
+        drive();
+
+        if(gamepad.y)
+            robot.outtake(-1);
+        else
+            robot.outtake(0);
+    }
+
+    private void drive() {
+        double y = gamepad.left_stick_y; // Remember, Y stick is reversed!
         double x = gamepad.left_stick_x;
         double rx = gamepad.right_stick_x;
 
@@ -29,6 +39,5 @@ public class NewTeleOp extends OpMode {
         double bLeftPower = y - x + rx;
 
         robot.drive(fRightPower, fLeftPower, bRightPower, bLeftPower);
-
     }
 }
