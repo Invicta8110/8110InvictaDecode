@@ -10,6 +10,7 @@ public class BumbleBot {
     private Motor bRight;
     private Motor bLeft;
     private Motor outtake;
+    private Motor testMotor;
 
     public BumbleBot(HardwareMap hardwareMap) {
         fRight = new Motor("front_right_drive", hardwareMap);
@@ -21,6 +22,7 @@ public class BumbleBot {
         bRight.setDirectionReverse();
 
         outtake = new Motor("OuttakeMotor", hardwareMap);
+        testMotor = new Motor("TestMotor", hardwareMap);
     }
 
     public void drive(double fRightPower, double fLeftPower, double bRightPower, double bLeftPower) {
@@ -33,6 +35,10 @@ public class BumbleBot {
 
     public void outtake(double power) {
         outtake.setPower(power);
+    }
+
+    public void testMotor(double power) {
+        testMotor.setPower(power);
     }
 
 }
