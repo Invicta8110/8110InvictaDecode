@@ -17,6 +17,7 @@ public class MotorTest extends OpMode {
 
     public void loop() {
         setMotors(gamepad1.a,0);
+        //robot.testMotor(motors[0]);
 
         //robot.drive(motors[0],motors[1],motors[2],motors[3]);
     }

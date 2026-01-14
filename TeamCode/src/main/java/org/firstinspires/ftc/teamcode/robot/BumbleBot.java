@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.mechanisms.Motor;
 
@@ -11,6 +12,9 @@ public class BumbleBot {
     private Motor bLeft;
     private Motor outtake;
     private Motor testMotor;
+    private Motor intake;
+    private Motor revolver;
+    private Servo kicker;
 
     public BumbleBot(HardwareMap hardwareMap) {
         fRight = new Motor("front_right_drive", hardwareMap);
@@ -22,7 +26,15 @@ public class BumbleBot {
         bRight.setDirectionReverse();
 
         outtake = new Motor("OuttakeMotor", hardwareMap);
-        testMotor = new Motor("TestMotor", hardwareMap);
+        intake = new Motor ("IntakeMotor",hardwareMap);
+        intake.setDirectionReverse();
+        revolver = new Motor("RevolverMotor",hardwareMap);
+
+        kicker = hardwareMap.get(Servo.class,"Kicker");
+        kicker.setPosition(.1);
+        kicker.setDirection(Servo.Direction.REVERSE);
+        
+        //testMotor = new Motor("TestMotor", hardwareMap);
     }
 
     public void drive(double fRightPower, double fLeftPower, double bRightPower, double bLeftPower) {
@@ -37,8 +49,24 @@ public class BumbleBot {
         outtake.setPower(power);
     }
 
-    public void testMotor(double power) {
-        testMotor.setPower(power);
+    public void kick() {
+    kicker.setPosition(0);
     }
+
+    public void unkick() {
+        kicker.setPosition(.1);
+    }
+
+    public void intake(double power) {
+        intake.setPower(power);
+    }
+
+    public void revolve(double direction) {
+        revolver.setPower(direction);
+    }
+
+//    public void testMotor(double power) {
+//        testMotor.setPower(power);
+//    }
 
 }
