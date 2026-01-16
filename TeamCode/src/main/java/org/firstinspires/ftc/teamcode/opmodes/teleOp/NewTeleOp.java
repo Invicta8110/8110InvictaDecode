@@ -12,49 +12,75 @@ import org.firstinspires.ftc.teamcode.robot.BumbleBot;
 public class NewTeleOp extends OpMode {
     private BumbleBot robot;
     private Gamepad gamepad;
-    private boolean oldY;
+    private boolean yPress;
     private boolean yToggle;
-    private boolean oldA;
+    private boolean aPress;
     private boolean aToggle;
+    private static long kickTimer;
+    private static long revolveTimer;
 
     public void init() {
         robot = new BumbleBot(hardwareMap);
         gamepad = gamepad1;
         telemetry.addData("Test","test");
-        oldY = false;
+        yPress = false;
     }
 
     public void loop() {
         drive();
         outtake();
-        revolve();
+        revolveOnEncode();
         intake();
         kick();
+        fullLaunch();
     }
 
     public void outtake() {
-        if(gamepad.y&&!oldY) {
+        if(gamepad.y&&!yPress) {
+            yPress = true;
             yToggle = !yToggle;
+        }
+        if(!gamepad.y) {
+            yPress = false;
         }
 
         if(yToggle)
-            robot.outtake(-1);
+            robot.outtake(-.7);
         else
             robot.outtake(0);
     }
 
     public void revolve() {
         if(gamepad.x) {
-            robot.revolve(.3);
+            robot.revolve(.5);
+            //revolveTimer = System.currentTimeMillis();
         }
-        else if(gamepad.b) {
-            robot.revolve(-.3);
-        }
+        //else if(gamepad.b) {
+        //    robot.revolve(-.5);
+        //}
         else {
+            robot.revolve(0);
+        }
+        telemetry.addData("Revolver",robot.getRevolverPos());
+    }
+
+    public void revolveOnTimer() {
+        if(gamepad.x&&System.currentTimeMillis()-revolveTimer>100) {
+            robot.revolve(.3);
+            revolveTimer = System.currentTimeMillis();
+        }
+        if(System.currentTimeMillis()-revolveTimer>100) {
             robot.revolve(0);
         }
     }
 
+    public void revolveOnEncode() {
+        if(gamepad.x&&System.currentTimeMillis()-revolveTimer>1000) {
+            revolveTimer = System.currentTimeMillis();
+            robot.revolveEncoder();
+            telemetry.addData("Revolver",robot.getRevolverPos());
+        }
+    }
     private void drive() {
         double y = -gamepad.left_stick_y; // Remember, Y stick is reversed!
         double x = -gamepad.left_stick_x;
@@ -89,14 +115,33 @@ public class NewTeleOp extends OpMode {
             robot.intake(0);
         }
 
+        if(gamepad.right_bumper) {
+            robot.reverseIntake();
+        }
+
     }
 
     private void kick() {
-        if(gamepad.dpad_down) {
-            robot.kick();
-        }
+//        if(gamepad.dpad_down) {
+//            telemetry.addData("kick",0);
+//            robot.kick();
+//        }
         if(gamepad.dpad_up) {
+            telemetry.addData("kick",0);
+            robot.kick();
+            kickTimer = System.currentTimeMillis();
+        }
+        if(System.currentTimeMillis()-kickTimer>1000) {
             robot.unkick();
+        }
+    }
+
+    private void fullLaunch() {
+        if(gamepad.b) {
+            robot.fullLaunchSequence(true);
+        }
+        else {
+            robot.fullLaunchSequence(false);
         }
     }
 }
