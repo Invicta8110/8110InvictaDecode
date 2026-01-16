@@ -104,7 +104,7 @@ public class BumbleBot {
         //unkick
 
         if(System.currentTimeMillis()-launchTimer>7000&&!unkicked) {
-            unkick();
+            //unkick();
             outtake.setPower(0);
             unkicked = true;
         }
@@ -113,7 +113,7 @@ public class BumbleBot {
             kicked = true;
         }
         else if(System.currentTimeMillis()-launchTimer<5000){
-            outtake.setPower(.7);
+            outtake.setPower(-.8);
             kicked = false;
             unkicked = false;
         }

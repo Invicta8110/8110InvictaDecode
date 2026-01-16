@@ -6,11 +6,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.robot.AutonBumbleBot;
 import org.firstinspires.ftc.teamcode.robot.BumbleBot;
 
 @TeleOp
 public class NewTeleOp extends OpMode {
-    private BumbleBot robot;
+    private AutonBumbleBot robot;
     private Gamepad gamepad;
     private boolean yPress;
     private boolean yToggle;
@@ -18,9 +19,10 @@ public class NewTeleOp extends OpMode {
     private boolean aToggle;
     private static long kickTimer;
     private static long revolveTimer;
+    private static long launchTimer;
 
     public void init() {
-        robot = new BumbleBot(hardwareMap);
+        robot = new AutonBumbleBot(hardwareMap,24);
         gamepad = gamepad1;
         telemetry.addData("Test","test");
         yPress = false;
@@ -29,10 +31,11 @@ public class NewTeleOp extends OpMode {
     public void loop() {
         drive();
         outtake();
-        revolveOnEncode();
+        revolve();
         intake();
-        kick();
+        kick(gamepad.dpad_up);
         fullLaunch();
+        launchKick(false);
     }
 
     public void outtake() {
@@ -45,14 +48,14 @@ public class NewTeleOp extends OpMode {
         }
 
         if(yToggle)
-            robot.outtake(-.7);
+            robot.outtake(-.8);
         else
             robot.outtake(0);
     }
 
     public void revolve() {
         if(gamepad.x) {
-            robot.revolve(.5);
+            robot.revolve(.3);
             //revolveTimer = System.currentTimeMillis();
         }
         //else if(gamepad.b) {
@@ -121,12 +124,12 @@ public class NewTeleOp extends OpMode {
 
     }
 
-    private void kick() {
+    private void kick(boolean kicking) {
 //        if(gamepad.dpad_down) {
 //            telemetry.addData("kick",0);
 //            robot.kick();
 //        }
-        if(gamepad.dpad_up) {
+        if(kicking) {
             telemetry.addData("kick",0);
             robot.kick();
             kickTimer = System.currentTimeMillis();
@@ -138,10 +141,32 @@ public class NewTeleOp extends OpMode {
 
     private void fullLaunch() {
         if(gamepad.b) {
+            robot.setPipeline(0);
+            boolean result = robot.findTag(1);
+            while(!result) {
+                result = robot.findTag(1);
+            }
+
+            result = robot.centerTag(1);
+            while(!result) {
+                telemetry.addData("Refining",result);
+                result = robot.centerTag(2);
+            }
             robot.fullLaunchSequence(true);
+            launchKick(true);
+            telemetry.addData("Launching",0);
         }
         else {
             robot.fullLaunchSequence(false);
+        }
+    }
+
+    private void launchKick(boolean kicking) {
+        if(kicking) {
+            launchTimer = System.currentTimeMillis();
+        }
+        else if(System.currentTimeMillis()-launchTimer>4000&&System.currentTimeMillis()-launchTimer<5000) {
+            kick(true);
         }
     }
 }

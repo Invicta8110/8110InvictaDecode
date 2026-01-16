@@ -49,7 +49,8 @@ public class AutonBumbleBot extends BumbleBot{
             return true;
         }
 
-        drive(-tagX/90,tagX/90,-tagX/90,tagX/90);
+        //drive(-tagX/90,tagX/90,-tagX/90,tagX/90);
+        drive(-.4,.4,-.4,.4);
 
         return false;
     }
