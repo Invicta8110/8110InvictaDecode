@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,6 +15,11 @@ public class BumbleBot {
     private Motor bRight;
     private Motor bLeft;
     private Motor outtake;
+
+    double motorPower = 1.0;
+    boolean DpadRightToggle = false;
+    boolean DpadLeftToggle = false;
+    double motorPower = 1.0;
     private Motor testMotor;
     private Motor intake;
     private Motor revolver;
@@ -54,8 +60,31 @@ public class BumbleBot {
 
     }
 
-    public void outtake(double power) {
-        outtake.setPower(power);
+    public void outtakeSpeedControl(){
+        if(gamepad1.dpad_right && !DpadRightToggle){
+            if (motorPower >= 1.0){
+                motorPower = 1.0;
+
+            } else {
+                motorPower += 0.1;
+            }
+        }
+        DpadRightToggle = gamepad1.dpad_right;
+        if(gamepad1.dpad_left && !DpadLeftToggle){
+            if(motorPower <= 0.0){
+                motorPower = 0.0;
+
+            } else {
+                motorPower -= 0.1;
+
+            }
+        }
+        DpadLeftToggle = gamepad1.dpad_left;
+    }
+
+
+    public void outtake() {
+        outtake.setPower(motorPower);
     }
 
     public void unkick() {

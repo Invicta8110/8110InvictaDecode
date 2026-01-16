@@ -30,6 +30,7 @@ public class NewTeleOp extends OpMode {
 
     public void loop() {
         drive();
+        robot.
         outtake();
         revolve();
         intake();
@@ -48,9 +49,9 @@ public class NewTeleOp extends OpMode {
         }
 
         if(yToggle)
-            robot.outtake(-.8);
+            robot.outtake();
         else
-            robot.outtake(0);
+            robot.outtake();
     }
 
     public void revolve() {
