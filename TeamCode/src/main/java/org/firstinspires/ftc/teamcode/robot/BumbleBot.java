@@ -16,14 +16,13 @@ public class BumbleBot {
     private Motor bLeft;
     private Motor outtake;
 
-    double motorPower = 1.0;
-    boolean DpadRightToggle = false;
-    boolean DpadLeftToggle = false;
-    double motorPower = 1.0;
+    double motorPower;
     private Motor testMotor;
     private Motor intake;
     private Motor revolver;
     private Servo kicker;
+    boolean DpadRightToggle = false;
+    boolean DpadLeftToggle = false;
     private int motorPos;
     private static long launchTimer;
     private boolean kicked;
@@ -59,28 +58,29 @@ public class BumbleBot {
         bLeft.setPower(bLeftPower);
 
     }
-
-    public void outtakeSpeedControl(){
-        if(gamepad1.dpad_right && !DpadRightToggle){
-            if (motorPower >= 1.0){
-                motorPower = 1.0;
-
-            } else {
-                motorPower += 0.1;
-            }
-        }
-        DpadRightToggle = gamepad1.dpad_right;
-        if(gamepad1.dpad_left && !DpadLeftToggle){
-            if(motorPower <= 0.0){
-                motorPower = 0.0;
+    public void outtakeSpeedControl(boolean dPadRight, boolean dPadLeft){
+        if(dPadRight && !DpadRightToggle){
+            if (motorPower <= -1.0){
+                motorPower = -1.0;
 
             } else {
                 motorPower -= 0.1;
+            }
+        }
+        DpadRightToggle = dPadRight;
+        if(dPadLeft && !DpadLeftToggle){
+            if(motorPower >= 0.0){
+                motorPower = 0.0;
+
+            } else {
+                motorPower += 0.1;
 
             }
         }
-        DpadLeftToggle = gamepad1.dpad_left;
+        DpadLeftToggle = dPadLeft;
     }
+
+
 
 
     public void outtake() {
