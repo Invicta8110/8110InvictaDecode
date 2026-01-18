@@ -16,6 +16,7 @@ public class AutonBumbleBot extends BumbleBot{
     private double tagX;
     private double tagY;
     private int goalTag;
+    private double tagA;
 
     public AutonBumbleBot(HardwareMap hardwareMap, int goalTag) {
         super(hardwareMap);
@@ -77,6 +78,10 @@ public class AutonBumbleBot extends BumbleBot{
             tagX = tagInfo.get(tags.indexOf(goalTag)).getTargetXDegrees();
             tagA = tagInfo.get(tags.indexOf(goalTag)).getTargetArea();
         }
+    }
+
+    public double getTagX() {
+        return tagX;
     }
 
     public double getTagArea() {

@@ -84,9 +84,9 @@ public class RedBackAutonOld extends LinearOpMode {
     private void launch() {
         telemetry.addData("launching","");
         telemetry.update();
-        robot.outtake();
+        robot.outtake(-.8);
         sleep(1500);
-        robot.outtake();
+        robot.outtake(-.8);
         telemetry.addData("launched","");
         telemetry.update();
     }

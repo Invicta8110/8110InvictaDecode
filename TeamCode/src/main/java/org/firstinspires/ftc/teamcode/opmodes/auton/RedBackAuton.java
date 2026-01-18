@@ -31,6 +31,8 @@ public class RedBackAuton extends LinearOpMode {
         robot.outtake(-.8);
         sleep(5000);
         robot.kick();
+        sleep(1000);
+        robot.unkick();
     }
 
 }

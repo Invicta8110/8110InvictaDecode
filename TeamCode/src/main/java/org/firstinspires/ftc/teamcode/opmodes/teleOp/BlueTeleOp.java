@@ -17,6 +17,7 @@ public class BlueTeleOp extends OpMode {
     private static long revolveTimer;
     private static long launchTimer;
     private double area;
+    private static long emergencyTimer;
 
     public void init() {
         robot = new AutonBumbleBot(hardwareMap,20);
@@ -37,6 +38,9 @@ public class BlueTeleOp extends OpMode {
         //robot.outtakeSpeedControl(gamepad1);
         telemetry.addData("Tag Area",robot.getTagArea());
         telemetry.addData("Square Root",Math.sqrt(robot.getTagArea()));
+        telemetry.addData("Left trigger",gamepad.left_trigger);
+        telemetry.addData("Right trigger", gamepad.left_trigger);
+        telemetry.addData("Tag X",robot.getTagX());
     }
 
     public void outtake() {
@@ -49,19 +53,23 @@ public class BlueTeleOp extends OpMode {
         }
 
         if(yToggle)
-            robot.outtake(-.8);
+            robot.outtake(estimateOuttakePower(area));
         else
             robot.outtake(0);
     }
 
     public void revolve() {
-        if(gamepad.x) {
-            robot.revolve(.3);
+        if(gamepad.left_trigger>0) {
+            robot.revolve(-.6*gamepad.left_trigger);
             //revolveTimer = System.currentTimeMillis();
         }
-        //else if(gamepad.b) {
-        //    robot.revolve(-.5);
-        //}
+        else if(gamepad.right_trigger>0) {
+            robot.revolve(.6*gamepad.right_trigger);
+            //revolveTimer = System.currentTimeMillis();
+        }
+        else if(gamepad.x) {
+            robot.revolve(-.3);
+        }
         else {
             robot.revolve(0);
         }
@@ -112,7 +120,7 @@ public class BlueTeleOp extends OpMode {
 //            aToggle = false;
 //        }
 
-        if(gamepad.a) {
+        if(gamepad.left_bumper||gamepad.a) {
             robot.intake(1);
         }
         else {
@@ -142,9 +150,10 @@ public class BlueTeleOp extends OpMode {
 
     private void fullLaunch() {
         if(gamepad.b) {
+            emergencyTimer = System.currentTimeMillis();
             robot.setPipeline(0);
             boolean result = robot.findTag(-1);
-            while(!result) {
+            while(!result&&System.currentTimeMillis()-emergencyTimer<3000) {
                 result = robot.findTag(-1);
             }
 
@@ -153,12 +162,19 @@ public class BlueTeleOp extends OpMode {
                 telemetry.addData("Refining",result);
                 result = robot.centerTag(2);
             }
-            robot.fullLaunchSequence(true,estimateOuttakePower(area));
-            launchKick(true);
-            telemetry.addData("Launching",0);
+            robot.outtake(estimateOuttakePower(area));
+            robot.launchStart();
+//            robot.fullLaunchSequence(true,estimateOuttakePower(area));
+//            launchKick(true);
+//            telemetry.addData("Launching",0);
         }
         else {
             robot.fullLaunchSequence(false,estimateOuttakePower(area));
+        }
+
+        if(gamepad.dpad_down) {
+            robot.launchEnd();
+            robot.outtake(0);
         }
     }
 
@@ -185,10 +201,10 @@ public class BlueTeleOp extends OpMode {
             return -.8;
         }
         else if(area<.009) {
-            return -.7;
+            return -.72;
         }
         else if(area<.03) {
-            return -.6;
+            return -.62;
         }
         else {
             return -.1;

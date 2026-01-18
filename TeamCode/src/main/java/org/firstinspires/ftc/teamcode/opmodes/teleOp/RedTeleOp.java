@@ -38,6 +38,9 @@ public class RedTeleOp extends OpMode {
         //robot.outtakeSpeedControl(gamepad1);
         telemetry.addData("Tag Area",robot.getTagArea());
         telemetry.addData("Square Root",Math.sqrt(robot.getTagArea()));
+        telemetry.addData("Left trigger",gamepad.left_trigger);
+        telemetry.addData("Right trigger", gamepad.left_trigger);
+        telemetry.addData("Tag X",robot.getTagX());
     }
 
     public void outtake() {
@@ -56,13 +59,17 @@ public class RedTeleOp extends OpMode {
     }
 
     public void revolve() {
-        if(gamepad.x) {
-            robot.revolve(.3);
+        if(gamepad.left_trigger>0) {
+            robot.revolve(-.6*gamepad.left_trigger);
             //revolveTimer = System.currentTimeMillis();
         }
-        //else if(gamepad.b) {
-        //    robot.revolve(-.5);
-        //}
+        else if(gamepad.right_trigger>0) {
+            robot.revolve(.6*gamepad.right_trigger);
+            //revolveTimer = System.currentTimeMillis();
+        }
+        else if(gamepad.x) {
+            robot.revolve(-.3);
+        }
         else {
             robot.revolve(0);
         }
