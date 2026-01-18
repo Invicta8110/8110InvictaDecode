@@ -44,7 +44,7 @@ public class AutonBumbleBot extends BumbleBot{
         getTags();
         result = camera.getLatestResult();
 
-        if(Math.abs(tagX)<error) {
+        if(Math.abs(tagX)-5<error) {
             drive(0,0,0,0);
             return true;
         }
@@ -75,7 +75,13 @@ public class AutonBumbleBot extends BumbleBot{
     private void getTagX(List<LLResultTypes.FiducialResult> tagInfo) {
         if(tags.contains(goalTag)) {
             tagX = tagInfo.get(tags.indexOf(goalTag)).getTargetXDegrees();
+            tagA = tagInfo.get(tags.indexOf(goalTag)).getTargetArea();
         }
+    }
+
+    public double getTagArea() {
+        getTags();
+        return tagA;
     }
 
     public void setPipeline(int index) {

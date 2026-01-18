@@ -1,16 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleOp;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.robot.AutonBumbleBot;
-import org.firstinspires.ftc.teamcode.robot.BumbleBot;
 
 @TeleOp
-public class NewTeleOp extends OpMode {
+public class RedTeleOp extends OpMode {
     private AutonBumbleBot robot;
     private Gamepad gamepad;
     private boolean yPress;
@@ -20,6 +16,8 @@ public class NewTeleOp extends OpMode {
     private static long kickTimer;
     private static long revolveTimer;
     private static long launchTimer;
+    private double area;
+    private static long emergencyTimer;
 
     public void init() {
         robot = new AutonBumbleBot(hardwareMap,24);
@@ -34,8 +32,12 @@ public class NewTeleOp extends OpMode {
         revolve();
         intake();
         kick(gamepad.dpad_up);
+        getArea();
         fullLaunch();
         launchKick(false);
+        //robot.outtakeSpeedControl(gamepad1);
+        telemetry.addData("Tag Area",robot.getTagArea());
+        telemetry.addData("Square Root",Math.sqrt(robot.getTagArea()));
     }
 
     public void outtake() {
@@ -48,7 +50,7 @@ public class NewTeleOp extends OpMode {
         }
 
         if(yToggle)
-            robot.outtake(-.8);
+            robot.outtake(estimateOuttakePower(area));
         else
             robot.outtake(0);
     }
@@ -111,7 +113,7 @@ public class NewTeleOp extends OpMode {
 //            aToggle = false;
 //        }
 
-        if(gamepad.a) {
+        if(gamepad.left_bumper||gamepad.a) {
             robot.intake(1);
         }
         else {
@@ -141,9 +143,10 @@ public class NewTeleOp extends OpMode {
 
     private void fullLaunch() {
         if(gamepad.b) {
+            emergencyTimer = System.currentTimeMillis();
             robot.setPipeline(0);
             boolean result = robot.findTag(1);
-            while(!result) {
+            while(!result&&System.currentTimeMillis()-emergencyTimer<3000) {
                 result = robot.findTag(1);
             }
 
@@ -152,12 +155,19 @@ public class NewTeleOp extends OpMode {
                 telemetry.addData("Refining",result);
                 result = robot.centerTag(2);
             }
-            robot.fullLaunchSequence(true);
-            launchKick(true);
-            telemetry.addData("Launching",0);
+            robot.outtake(estimateOuttakePower(area));
+            robot.launchStart();
+//            robot.fullLaunchSequence(true,estimateOuttakePower(area));
+//            launchKick(true);
+//            telemetry.addData("Launching",0);
         }
         else {
-            robot.fullLaunchSequence(false);
+            robot.fullLaunchSequence(false,estimateOuttakePower(area));
+        }
+
+        if(gamepad.dpad_down) {
+            robot.launchEnd();
+            robot.outtake(0);
         }
     }
 
@@ -167,6 +177,30 @@ public class NewTeleOp extends OpMode {
         }
         else if(System.currentTimeMillis()-launchTimer>4000&&System.currentTimeMillis()-launchTimer<5000) {
             kick(true);
+            robot.launchEnd();
+        }
+    }
+
+    private void getArea() {
+        area = robot.getTagArea();
+    }
+
+    private double estimateOuttakePower(double area) {
+        //.003 - back launch
+        //.008 - just barely in front
+        //.0256 - about halfway to goal
+
+        if(area<.004) {
+            return -.8;
+        }
+        else if(area<.009) {
+            return -.72;
+        }
+        else if(area<.03) {
+            return -.62;
+        }
+        else {
+            return -.1;
         }
     }
 }

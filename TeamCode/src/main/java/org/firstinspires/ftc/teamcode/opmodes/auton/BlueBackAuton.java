@@ -6,20 +6,20 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.robot.AutonBumbleBot;
 
 @Autonomous
-public class RedBackAuton extends LinearOpMode {
+public class BlueBackAuton extends LinearOpMode {
     AutonBumbleBot robot;
 
     public void runOpMode() {
-        robot = new AutonBumbleBot(hardwareMap,24);
+        robot = new AutonBumbleBot(hardwareMap,20);
         robot.setPipeline(0);
 
         waitForStart();
 
         telemetry.addData("Tags",robot.getTags());
 
-        boolean result = robot.findTag(1);
+        boolean result = robot.findTag(-1);
         while(opModeIsActive()&&!result) {
-            result = robot.findTag(1);
+            result = robot.findTag(-1);
         }
 
         result = robot.centerTag(1);

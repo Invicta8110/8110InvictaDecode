@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -22,6 +23,10 @@ public class BumbleBot {
     private static long launchTimer;
     private boolean kicked;
     private boolean unkicked;
+    private double motorPower;
+    private boolean DpadRightToggle;
+    private boolean DpadLeftToggle;
+    private boolean launching;
 
     public BumbleBot(HardwareMap hardwareMap) {
         fRight = new Motor("front_right_drive", hardwareMap);
@@ -42,6 +47,12 @@ public class BumbleBot {
         //kicker.setPosition(.1);
         kicker.setDirection(Servo.Direction.REVERSE);
         motorPos = revolver.getCurrentPosition();
+
+        motorPower = 0;
+        DpadLeftToggle = false;
+        DpadRightToggle = false;
+        launching = false;
+
         
         //testMotor = new Motor("TestMotor", hardwareMap);
     }
@@ -54,8 +65,32 @@ public class BumbleBot {
 
     }
 
+    public void outtakeSpeedControl(Gamepad gamepad1){
+        if(gamepad1.dpad_right && !DpadRightToggle){
+            if (motorPower >= 1.0){
+                motorPower = 1.0;
+
+            } else {
+                motorPower += 0.1;
+            }
+        }
+        DpadRightToggle = gamepad1.dpad_right;
+        if(gamepad1.dpad_left && !DpadLeftToggle){
+            if(motorPower <= 0.0){
+                motorPower = 0.0;
+
+            } else {
+                motorPower -= 0.1;
+
+            }
+        }
+        DpadLeftToggle = gamepad1.dpad_left;
+    }
+
     public void outtake(double power) {
-        outtake.setPower(power);
+        if(!launching) {
+            outtake.setPower(power);
+        }
     }
 
     public void unkick() {
@@ -94,9 +129,10 @@ public class BumbleBot {
 //        testMotor.setPower(power);
 //    }
 
-    public void fullLaunchSequence(boolean start) {
+    public void fullLaunchSequence(boolean start, double power) {
         if(start) {
             launchTimer = System.currentTimeMillis();
+            launching = true;
         }
 
         //warm up outtake
@@ -107,16 +143,25 @@ public class BumbleBot {
             //unkick();
             outtake.setPower(0);
             unkicked = true;
+            launching = false;
         }
         else if(System.currentTimeMillis()-launchTimer>5000&&!kicked) {
             kick();
             kicked = true;
         }
         else if(System.currentTimeMillis()-launchTimer<5000){
-            outtake.setPower(-.8);
+            outtake.setPower(power);
             kicked = false;
             unkicked = false;
         }
+    }
+
+    public void launchStart() {
+        launching = true;
+    }
+
+    public void launchEnd() {
+        launching = false;
     }
 
 }
