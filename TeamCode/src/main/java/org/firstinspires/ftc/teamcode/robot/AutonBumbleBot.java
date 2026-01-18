@@ -14,7 +14,7 @@ public class AutonBumbleBot extends BumbleBot{
     private LLResult result;
     private ArrayList<Integer> tags;
     private double tagX;
-    private double tagA;
+    private double tagY;
     private int goalTag;
 
     public AutonBumbleBot(HardwareMap hardwareMap, int goalTag) {
